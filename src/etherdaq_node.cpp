@@ -132,14 +132,17 @@ int main(int argc, char **argv)
   }
 	
   ros::Publisher pub;
+  ros::Publisher pub2;
   ros::Subscriber sub = nh.subscribe("ethdaq_zero", 1000, zeroFunction);
   if (publish_wrench)
   {
     pub = nh.advertise<geometry_msgs::Wrench>(topicName, 100);
+	pub2 = nh.advertise<geometry_msgs::Wrench>(topicName+"_neg", 100);
   }
   else 
   {
     pub = nh.advertise<geometry_msgs::WrenchStamped>(topicName, 100);
+	pub2 = nh.advertise<geometry_msgs::WrenchStamped>(topicName+"_neg", 100);
   }
   ros::Rate pub_rate(pub_rate_hz);
   geometry_msgs::WrenchStamped data;
@@ -163,11 +166,27 @@ int main(int argc, char **argv)
       {
 	data.header.frame_id = frame_id;
         pub.publish(data.wrench);
+		geometry_msgs::WrenchStamped msg = data;
+		msg.wrench.force.x*=-1.0;
+		msg.wrench.force.y*=-1.0;
+		msg.wrench.force.z*=-1.0;
+		msg.wrench.torque.x*=-1.0;
+		msg.wrench.torque.y*=-1.0;
+		msg.wrench.torque.z*=-1.0;
+		pub2.publish(msg.wrench);
       }
       else 
       {
    	data.header.frame_id = frame_id;
         pub.publish(data);
+		geometry_msgs::WrenchStamped msg = data;
+		msg.wrench.force.x*=-1.0;
+		msg.wrench.force.y*=-1.0;
+		msg.wrench.force.z*=-1.0;
+		msg.wrench.torque.x*=-1.0;
+		msg.wrench.torque.y*=-1.0;
+		msg.wrench.torque.z*=-1.0;
+		pub2.publish(msg);
       }
     }
     
